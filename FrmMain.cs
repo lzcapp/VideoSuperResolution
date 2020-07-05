@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using OpenCvSharp;
 using Size = OpenCvSharp.Size;
+using Timer = System.Timers.Timer;
 
 namespace VideoSuperResolution {
     public partial class FrmMain : Form {
@@ -34,7 +36,7 @@ namespace VideoSuperResolution {
             string filename = Path.GetFileName(file);
             string audio = Path.Combine(temppath, "output.mp3");
             string opencv_out = Path.Combine(temppath, "output.mp4");
-            string file_output = Path.Combine(path, "output_" + filename);
+            string file_output = Path.Combine(path, "[superresolution]" + filename);
             string ffmpegPath = ConfigurationManager.AppSettings["ffmpeg"];
 
             int index = 1;
@@ -60,8 +62,12 @@ namespace VideoSuperResolution {
             Size dsize = new Size(video_in.FrameWidth * 2, video_in.FrameHeight * 2);
             VideoWriter video_out = new VideoWriter(opencv_out, fourCC, fps, dsize, true);
             var max = video_in.FrameCount;
+
             progressBar1.Value = 0;
             progressBar1.Maximum = max;
+
+            TimeSpan interval_start = new TimeSpan(System.DateTime.Now.Ticks);
+
             while (video_in.IsOpened()) {
                 Mat frame_in = new Mat();
                 var status = video_in.Read(frame_in);
@@ -76,8 +82,17 @@ namespace VideoSuperResolution {
                 MemoryStream ms_out = new MemoryStream(frame_out.ToBytes());
                 Image image_out = Image.FromStream(ms_out); 
                 PicVidOut.Image = image_out;
+
                 var percentage = Math.Round((float)index / max * 100, 2);
-                label2.Text = index + "/" + max + " - " + percentage + "%";
+
+                TimeSpan interval_now = new TimeSpan(System.DateTime.Now.Ticks);
+                TimeSpan countTime = interval_start.Subtract(interval_now).Duration();
+                int second = (int)(countTime.TotalSeconds / ((float)index / max));
+                int hour = second / 3600;
+                second %= 3600;
+                int minute = second / 60;
+                second %= 60;
+                label2.Text = index + "/" + max + " Frames  -  " + percentage + "%    Approximately " + hour + "H" + minute + "M" + second + "S Left";
                 progressBar1.Value++;
                 index++;
             }
@@ -109,6 +124,7 @@ namespace VideoSuperResolution {
             Size dsize = new Size(frame_in.Width * 2, frame_in.Height * 2);
             double fx = 0, fy = 0;
             InterpolationFlags interpolation = InterpolationFlags.Lanczos4;
+            // InterpolationFlags interpolation = InterpolationFlags.Cubic;
             Mat frame_out = frame_in.Resize(dsize, fx, fy, interpolation);
             // MemoryStream ms = new MemoryStream(frame_out.ToBytes());
             // Image image = System.Drawing.Image.FromStream(ms);
