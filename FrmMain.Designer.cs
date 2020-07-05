@@ -23,6 +23,7 @@
         /// 使用代码编辑器修改此方法的内容。
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.PicVidIn = new System.Windows.Forms.PictureBox();
             this.PicVidOut = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -107,10 +108,11 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.PicVidOut);
             this.Controls.Add(this.PicVidIn);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.MaximizeBox = false;
             this.Name = "FrmMain";
-            this.Text = "Form1";
+            this.Text = "Video Super-Resolution";
             this.Load += new System.EventHandler(this.FrmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.PicVidIn)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PicVidOut)).EndInit();
